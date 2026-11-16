@@ -8,10 +8,20 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     @media print {
+      @page { size: A4; margin: 10mm 12mm; }
+      body { background: #ffffff !important; color: #000000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body * { visibility: hidden; }
       #policyReaderCard, #policyReaderCard * { visibility: visible; }
-      #policyReaderCard { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; border: none !important; }
+      #policyReaderCard { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
       .no-print { display: none !important; }
+      table.print-wrapper { width: 100%; border-collapse: collapse; border: none !important; }
+      table.print-wrapper > thead { display: table-header-group; }
+      table.print-wrapper > tfoot { display: table-footer-group; }
+      table.print-wrapper > thead > tr > td,
+      table.print-wrapper > tfoot > tr > td,
+      table.print-wrapper > tbody > tr > td { border: none !important; padding: 0 !important; }
+      .doc-footer-space { padding-top: 12px; }
+      .doc-header-space { padding-bottom: 10px; }
     }
   </style>
 </head>
@@ -28,13 +38,11 @@
         <p class="text-teal-200 text-xs mt-1">NABH 6th Edition Live Policy & SOP Portal</p>
       </div>
 
-      <!-- Tabs -->
       <div class="flex border-b border-slate-200">
         <button id="tabLogin" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-semibold text-teal-700 border-b-2 border-teal-700 bg-teal-50/40">Staff Login</button>
         <button id="tabSignup" onclick="switchAuthTab('signup')" class="w-1/2 py-3 text-sm font-semibold text-slate-500 hover:text-teal-700">New Staff Signup</button>
       </div>
 
-      <!-- Login Form -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number (User ID)</label>
@@ -49,7 +57,6 @@
         </button>
       </form>
 
-      <!-- Signup Form -->
       <form id="signupForm" onsubmit="handleSignup(event)" class="p-6 space-y-4 hidden">
         <div>
           <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name</label>
@@ -80,7 +87,6 @@
         </button>
       </form>
 
-      <!-- Credentials Display Box after Signup -->
       <div id="credBox" class="mx-6 mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl hidden">
         <p class="text-xs font-bold text-amber-800 uppercase mb-1"><i class="fa-solid fa-key mr-1"></i> Save Your Login Credentials:</p>
         <p class="text-sm text-slate-800">User ID (Phone): <strong id="showUserId" class="select-all"></strong></p>
@@ -92,7 +98,6 @@
 
   <!-- MAIN POLICY PORTAL DASHBOARD -->
   <div id="portalSection" class="hidden flex-1 flex flex-col">
-    <!-- Top Navbar -->
     <header class="bg-teal-800 text-white shadow-md sticky top-0 z-30 no-print">
       <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -114,10 +119,9 @@
       </div>
     </header>
 
-    <!-- Main Split Layout -->
     <div class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
       
-      <!-- LEFT SIDEBAR: HEADINGS LIST & SEARCH -->
+      <!-- LEFT SIDEBAR -->
       <aside class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col max-h-[82vh] no-print">
         <div class="p-3.5 border-b border-slate-200 bg-slate-50 rounded-t-xl">
           <div class="relative">
@@ -130,20 +134,18 @@
           </div>
         </div>
 
-        <!-- Headings List Container -->
         <div id="headingsList" class="overflow-y-auto divide-y divide-slate-100 flex-1 p-1.5">
           <div class="text-center py-10 text-slate-400 text-xs">
             <i class="fa-solid fa-circle-notch fa-spin text-2xl text-teal-600 mb-2"></i>
-            <p>Reading Master Google Doc Headings...</p>
+            <p>Loading Policies...</p>
           </div>
         </div>
       </aside>
 
       <!-- RIGHT PANEL: SELECTED POLICY CONTENT VIEWER -->
       <main class="lg:col-span-8 flex flex-col">
-        <div id="policyReaderCard" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-7 flex-1 min-h-[75vh]">
+        <div id="policyReaderCard" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-8 flex-1 min-h-[75vh]">
           
-          <!-- Action Toolbar (Hidden until a policy is selected) -->
           <div id="readerToolbar" class="hidden flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200 no-print">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
               <i class="fa-solid fa-circle-check mr-1.5"></i> Approved Live Document
@@ -152,21 +154,20 @@
               <button onclick="openCorrectionModal()" class="inline-flex items-center px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-lg transition">
                 <i class="fa-solid fa-pen-to-square mr-1.5"></i> Suggest Correction
               </button>
-              <button onclick="window.print()" class="inline-flex items-center px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
-                <i class="fa-solid fa-print mr-1.5"></i> Print Section
+              <button onclick="window.print()" class="inline-flex items-center px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg transition shadow-sm">
+                <i class="fa-solid fa-print mr-1.5"></i> Print Official Policy
               </button>
             </div>
           </div>
 
-          <!-- Dynamic Policy Content Area -->
-          <div id="policyContentArea" class="prose max-w-none">
+          <div id="policyContentArea" class="max-w-none">
             <div class="text-center py-20 text-slate-400">
               <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-teal-600">
                 <i class="fa-solid fa-book-open-reader"></i>
               </div>
               <h3 class="text-base font-bold text-slate-700">Select a Policy Heading from the Left</h3>
               <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                Click on any NABH chapter, objective element, or SOP title in the index to view only that specific policy section directly from the master document.
+                Click on any NABH policy in the index to view and print it with official Shah Hospital Header & Footer.
               </p>
             </div>
           </div>
@@ -238,7 +239,6 @@
       const btn = document.getElementById("signupBtn");
       btn.disabled = true;
       btn.innerText = "Creating Account...";
-
       try {
         const res = await callApi({
           action: "signup",
@@ -246,7 +246,6 @@
           phone: document.getElementById("regPhone").value,
           department: document.getElementById("regDept").value
         });
-
         if (res.status === "success") {
           currentUser = res.user;
           localStorage.setItem("shahHospitalDocUser", JSON.stringify(currentUser));
@@ -259,7 +258,6 @@
       } catch (err) {
         alert("Server connection error. Please try again.");
       }
-
       btn.disabled = false;
       btn.innerText = "Create ID & Password";
     }
@@ -269,14 +267,12 @@
       const btn = document.getElementById("loginBtn");
       btn.disabled = true;
       btn.innerText = "Verifying...";
-
       try {
         const res = await callApi({
           action: "login",
           phone: document.getElementById("loginPhone").value,
           password: document.getElementById("loginPassword").value
         });
-
         if (res.status === "success") {
           currentUser = res.user;
           localStorage.setItem("shahHospitalDocUser", JSON.stringify(currentUser));
@@ -287,19 +283,12 @@
       } catch (err) {
         alert("Server connection error. Please try again.");
       }
-
       btn.disabled = false;
       btn.innerText = "Login to Portal";
     }
 
-    function proceedToPortal() {
-      showPortal();
-    }
-
-    function logout() {
-      localStorage.removeItem("shahHospitalDocUser");
-      location.reload();
-    }
+    function proceedToPortal() { showPortal(); }
+    function logout() { localStorage.removeItem("shahHospitalDocUser"); location.reload(); }
 
     async function showPortal() {
       document.getElementById("authSection").classList.add("hidden");
@@ -316,7 +305,7 @@
           document.getElementById("headingsList").innerHTML = `<p class="p-4 text-xs text-red-600">${res.message}</p>`;
         }
       } catch (err) {
-        document.getElementById("headingsList").innerHTML = `<p class="p-4 text-xs text-red-600">Failed to load headings from Google Doc.</p>`;
+        document.getElementById("headingsList").innerHTML = `<p class="p-4 text-xs text-red-600">Failed to load headings.</p>`;
       }
     }
 
@@ -336,12 +325,10 @@
         btn.className = `w-full text-left px-3 py-2.5 rounded-lg text-xs transition flex items-start gap-2 ${
           isActive
             ? "bg-teal-700 text-white font-semibold shadow-sm"
-            : h.level === 1
-              ? "font-bold text-slate-800 hover:bg-teal-50"
-              : "pl-6 text-slate-600 hover:bg-slate-100"
+            : "font-semibold text-slate-700 hover:bg-teal-50"
         }`;
         btn.innerHTML = `
-          <i class="fa-solid ${h.level === 1 ? 'fa-folder-open text-teal-500' : 'fa-file-lines text-slate-400'} mt-0.5 ${isActive ? 'text-teal-200' : ''}"></i>
+          <i class="fa-solid fa-file-lines mt-0.5 ${isActive ? 'text-teal-200' : 'text-teal-600'}"></i>
           <span class="leading-snug">${h.title}</span>
         `;
         btn.onclick = () => loadSectionContent(h);
@@ -357,7 +344,7 @@
 
     async function loadSectionContent(headingObj) {
       activeHeading = headingObj;
-      filterHeadings(); // Highlight selected item
+      filterHeadings();
 
       const contentArea = document.getElementById("policyContentArea");
       const toolbar = document.getElementById("readerToolbar");
@@ -366,7 +353,7 @@
       contentArea.innerHTML = `
         <div class="text-center py-20 text-slate-400">
           <i class="fa-solid fa-circle-notch fa-spin text-3xl text-teal-600 mb-2"></i>
-          <p class="text-xs font-medium text-slate-600">Fetching "${headingObj.title}"...</p>
+          <p class="text-xs font-medium text-slate-600">Loading "${headingObj.title}"...</p>
         </div>
       `;
 
@@ -379,12 +366,23 @@
         if (res.status === "success") {
           toolbar.classList.remove("hidden");
           toolbar.classList.add("flex");
-          contentArea.innerHTML = res.html || `<p class="text-sm text-slate-500">No text content under this heading.</p>`;
+
+          // Google Doc के असली Header और Footer के साथ Print Wrapper बनाएं
+          const headerBlock = res.headerHtml ? `<div class="doc-header-space border-b border-slate-200 pb-3 mb-4">${res.headerHtml}</div>` : "";
+          const footerBlock = res.footerHtml ? `<div class="doc-footer-space border-t border-slate-200 pt-3 mt-6">${res.footerHtml}</div>` : "";
+
+          contentArea.innerHTML = `
+            <table class="print-wrapper w-full">
+              ${headerBlock ? `<thead><tr><td>${headerBlock}</td></tr></thead>` : ""}
+              <tbody><tr><td>${res.html || "<p class='text-sm text-slate-500'>No content found.</p>"}</td></tr></tbody>
+              ${footerBlock ? `<tfoot><tr><td>${footerBlock}</td></tr></tfoot>` : ""}
+            </table>
+          `;
         } else {
           contentArea.innerHTML = `<p class="text-sm text-red-600">${res.message}</p>`;
         }
       } catch (err) {
-        contentArea.innerHTML = `<p class="text-sm text-red-600">Error loading policy section. Please try again.</p>`;
+        contentArea.innerHTML = `<p class="text-sm text-red-600">Error loading policy section.</p>`;
       }
     }
 
@@ -404,11 +402,9 @@
     async function submitCorrection() {
       const text = document.getElementById("corrText").value.trim();
       if (!text) return alert("कृपया सुधार का विवरण लिखें।");
-
       const btn = document.getElementById("submitCorrBtn");
       btn.disabled = true;
       btn.innerText = "Submitting...";
-
       try {
         const res = await callApi({
           action: "submitCorrection",
@@ -418,7 +414,6 @@
           headingTitle: activeHeading.title,
           correctionText: text
         });
-
         if (res.status === "success") {
           alert(res.message);
           closeCorrectionModal();
@@ -426,9 +421,8 @@
           alert(res.message);
         }
       } catch (err) {
-        alert("Failed to submit correction. Please try again.");
+        alert("Failed to submit correction.");
       }
-
       btn.disabled = false;
       btn.innerText = "Submit Correction";
     }
