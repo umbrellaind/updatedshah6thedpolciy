@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shah Hospital - NABH 6th Edition Live Policy Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #policyReaderCard, #policyReaderCard * { visibility: visible; }
+      #policyReaderCard { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; border: none !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- AUTH SCREEN (LOGIN / SIGNUP) -->
+  <div id="authSection" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+      <div class="bg-teal-800 p-6 text-white text-center">
+        <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <h1 class="text-xl font-bold tracking-wide">SHAH HOSPITAL</h1>
+        <p class="text-teal-200 text-xs mt-1">NABH 6th Edition Live Policy & SOP Portal</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-200">
+        <button id="tabLogin" onclick="switchAuthTab('login')" class="w-1/2 py-3 text-sm font-semibold text-teal-700 border-b-2 border-teal-700 bg-teal-50/40">Staff Login</button>
+        <button id="tabSignup" onclick="switchAuthTab('signup')" class="w-1/2 py-3 text-sm font-semibold text-slate-500 hover:text-teal-700">New Staff Signup</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number (User ID)</label>
+          <input type="tel" id="loginPhone" required placeholder="Enter 10-digit mobile number" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter your password" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+        </div>
+        <button type="submit" id="loginBtn" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-semibold py-2.5 rounded-lg transition shadow-sm">
+          Login to Portal
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" onsubmit="handleSignup(event)" class="p-6 space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name</label>
+          <input type="text" id="regName" required placeholder="e.g. Dr. Rahul Sharma / Sister Priya" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number (Will be User ID)</label>
+          <input type="tel" id="regPhone" required placeholder="Enter mobile number" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Department</label>
+          <select id="regDept" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm bg-white">
+            <option value="">-- Select Department --</option>
+            <option>Administration & Quality</option>
+            <option>Medical / Doctors</option>
+            <option>Nursing Services</option>
+            <option>ICU / Emergency / OT</option>
+            <option>Pharmacy</option>
+            <option>Laboratory & Radiology</option>
+            <option>Medical Records (MRD)</option>
+            <option>Front Office / Billing</option>
+            <option>HR & Training</option>
+            <option>Maintenance / Biomedical / Housekeeping</option>
+          </select>
+        </div>
+        <button type="submit" id="signupBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition shadow-sm">
+          Create ID & Password
+        </button>
+      </form>
+
+      <!-- Credentials Display Box after Signup -->
+      <div id="credBox" class="mx-6 mb-6 p-4 bg-amber-50 border border-amber-300 rounded-xl hidden">
+        <p class="text-xs font-bold text-amber-800 uppercase mb-1"><i class="fa-solid fa-key mr-1"></i> Save Your Login Credentials:</p>
+        <p class="text-sm text-slate-800">User ID (Phone): <strong id="showUserId" class="select-all"></strong></p>
+        <p class="text-sm text-slate-800">Password: <strong id="showUserPass" class="select-all text-teal-700"></strong></p>
+        <button onclick="proceedToPortal()" class="mt-3 w-full bg-teal-700 text-white text-xs font-semibold py-2 rounded-lg">Continue to Policies &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN POLICY PORTAL DASHBOARD -->
+  <div id="portalSection" class="hidden flex-1 flex flex-col">
+    <!-- Top Navbar -->
+    <header class="bg-teal-800 text-white shadow-md sticky top-0 z-30 no-print">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-shield-heart text-2xl text-teal-300"></i>
+          <div>
+            <h1 class="font-bold text-base sm:text-lg leading-tight">SHAH HOSPITAL — NABH POLICY PORTAL</h1>
+            <p class="text-xs text-teal-200">Live Master Document Reader (6th Edition)</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right hidden sm:block">
+            <p id="navUserName" class="text-sm font-semibold"></p>
+            <p id="navUserDept" class="text-xs text-teal-200"></p>
+          </div>
+          <button onclick="logout()" class="bg-teal-900 hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Split Layout -->
+    <div class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+      
+      <!-- LEFT SIDEBAR: HEADINGS LIST & SEARCH -->
+      <aside class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col max-h-[82vh] no-print">
+        <div class="p-3.5 border-b border-slate-200 bg-slate-50 rounded-t-xl">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            <input type="text" id="headingSearch" onkeyup="filterHeadings()" placeholder="Search Policy / Chapter / Doc No..." class="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none text-xs bg-white">
+          </div>
+          <div class="flex justify-between items-center mt-2 text-[11px] text-slate-500 font-semibold">
+            <span>POLICY INDEX</span>
+            <span id="headingCount" class="text-teal-700">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Headings List Container -->
+        <div id="headingsList" class="overflow-y-auto divide-y divide-slate-100 flex-1 p-1.5">
+          <div class="text-center py-10 text-slate-400 text-xs">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-teal-600 mb-2"></i>
+            <p>Reading Master Google Doc Headings...</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT PANEL: SELECTED POLICY CONTENT VIEWER -->
+      <main class="lg:col-span-8 flex flex-col">
+        <div id="policyReaderCard" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-7 flex-1 min-h-[75vh]">
+          
+          <!-- Action Toolbar (Hidden until a policy is selected) -->
+          <div id="readerToolbar" class="hidden flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200 no-print">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+              <i class="fa-solid fa-circle-check mr-1.5"></i> Approved Live Document
+            </span>
+            <div class="flex items-center gap-2">
+              <button onclick="openCorrectionModal()" class="inline-flex items-center px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-lg transition">
+                <i class="fa-solid fa-pen-to-square mr-1.5"></i> Suggest Correction
+              </button>
+              <button onclick="window.print()" class="inline-flex items-center px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                <i class="fa-solid fa-print mr-1.5"></i> Print Section
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Policy Content Area -->
+          <div id="policyContentArea" class="prose max-w-none">
+            <div class="text-center py-20 text-slate-400">
+              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-teal-600">
+                <i class="fa-solid fa-book-open-reader"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-700">Select a Policy Heading from the Left</h3>
+              <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                Click on any NABH chapter, objective element, or SOP title in the index to view only that specific policy section directly from the master document.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- CORRECTION MODAL -->
+  <div id="correctionModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50 no-print">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-3 mb-4">
+        <h3 class="font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-amber-600 mr-2"></i>Suggest Policy Correction</h3>
+        <button onclick="closeCorrectionModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="mb-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+        <p class="text-xs text-slate-500">Selected Policy / Heading:</p>
+        <p id="corrHeadingTitle" class="text-sm font-bold text-teal-800 mt-0.5"></p>
+      </div>
+      <textarea id="corrText" rows="4" placeholder="यहाँ लिखें कि इस पॉलिसी में क्या बदलाव या सुधार (Correction) करना है..." class="w-full p-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+      <div class="mt-4 flex justify-end gap-2">
+        <button onclick="closeCorrectionModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+        <button id="submitCorrBtn" onclick="submitCorrection()" class="px-5 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-lg">Submit Correction</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxzURro1duXbyHX5EHaOpAJEzu8kKPxuzskNvKowQICykHq7yut6CNDEPVhXvWQV3DL/exec";
+
+    let currentUser = null;
+    let allHeadings = [];
+    let activeHeading = null;
+
+    window.onload = () => {
+      const saved = localStorage.getItem("shahHospitalDocUser");
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        showPortal();
+      }
+    };
+
+    function switchAuthTab(tab) {
+      document.getElementById("credBox").classList.add("hidden");
+      if (tab === "login") {
+        document.getElementById("loginForm").classList.remove("hidden");
+        document.getElementById("signupForm").classList.add("hidden");
+        document.getElementById("tabLogin").className = "w-1/2 py-3 text-sm font-semibold text-teal-700 border-b-2 border-teal-700 bg-teal-50/40";
+        document.getElementById("tabSignup").className = "w-1/2 py-3 text-sm font-semibold text-slate-500 hover:text-teal-700";
+      } else {
+        document.getElementById("signupForm").classList.remove("hidden");
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("tabSignup").className = "w-1/2 py-3 text-sm font-semibold text-teal-700 border-b-2 border-teal-700 bg-teal-50/40";
+        document.getElementById("tabLogin").className = "w-1/2 py-3 text-sm font-semibold text-slate-500 hover:text-teal-700";
+      }
+    }
+
+    async function callApi(payload) {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      const btn = document.getElementById("signupBtn");
+      btn.disabled = true;
+      btn.innerText = "Creating Account...";
+
+      try {
+        const res = await callApi({
+          action: "signup",
+          name: document.getElementById("regName").value,
+          phone: document.getElementById("regPhone").value,
+          department: document.getElementById("regDept").value
+        });
+
+        if (res.status === "success") {
+          currentUser = res.user;
+          localStorage.setItem("shahHospitalDocUser", JSON.stringify(currentUser));
+          document.getElementById("showUserId").innerText = res.user.phone;
+          document.getElementById("showUserPass").innerText = res.user.password;
+          document.getElementById("credBox").classList.remove("hidden");
+        } else {
+          alert(res.message);
+        }
+      } catch (err) {
+        alert("Server connection error. Please try again.");
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Create ID & Password";
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true;
+      btn.innerText = "Verifying...";
+
+      try {
+        const res = await callApi({
+          action: "login",
+          phone: document.getElementById("loginPhone").value,
+          password: document.getElementById("loginPassword").value
+        });
+
+        if (res.status === "success") {
+          currentUser = res.user;
+          localStorage.setItem("shahHospitalDocUser", JSON.stringify(currentUser));
+          showPortal();
+        } else {
+          alert(res.message);
+        }
+      } catch (err) {
+        alert("Server connection error. Please try again.");
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Login to Portal";
+    }
+
+    function proceedToPortal() {
+      showPortal();
+    }
+
+    function logout() {
+      localStorage.removeItem("shahHospitalDocUser");
+      location.reload();
+    }
+
+    async function showPortal() {
+      document.getElementById("authSection").classList.add("hidden");
+      document.getElementById("portalSection").classList.remove("hidden");
+      document.getElementById("navUserName").innerText = currentUser.name;
+      document.getElementById("navUserDept").innerText = currentUser.department + " (" + currentUser.phone + ")";
+
+      try {
+        const res = await callApi({ action: "getHeadings" });
+        if (res.status === "success") {
+          allHeadings = res.headings;
+          renderHeadings(allHeadings);
+        } else {
+          document.getElementById("headingsList").innerHTML = `<p class="p-4 text-xs text-red-600">${res.message}</p>`;
+        }
+      } catch (err) {
+        document.getElementById("headingsList").innerHTML = `<p class="p-4 text-xs text-red-600">Failed to load headings from Google Doc.</p>`;
+      }
+    }
+
+    function renderHeadings(list) {
+      const container = document.getElementById("headingsList");
+      document.getElementById("headingCount").innerText = list.length + " Sections";
+      container.innerHTML = "";
+
+      if (list.length === 0) {
+        container.innerHTML = `<p class="p-4 text-xs text-slate-400 text-center">No matching headings found.</p>`;
+        return;
+      }
+
+      list.forEach(h => {
+        const btn = document.createElement("button");
+        const isActive = activeHeading && activeHeading.index === h.index;
+        btn.className = `w-full text-left px-3 py-2.5 rounded-lg text-xs transition flex items-start gap-2 ${
+          isActive
+            ? "bg-teal-700 text-white font-semibold shadow-sm"
+            : h.level === 1
+              ? "font-bold text-slate-800 hover:bg-teal-50"
+              : "pl-6 text-slate-600 hover:bg-slate-100"
+        }`;
+        btn.innerHTML = `
+          <i class="fa-solid ${h.level === 1 ? 'fa-folder-open text-teal-500' : 'fa-file-lines text-slate-400'} mt-0.5 ${isActive ? 'text-teal-200' : ''}"></i>
+          <span class="leading-snug">${h.title}</span>
+        `;
+        btn.onclick = () => loadSectionContent(h);
+        container.appendChild(btn);
+      });
+    }
+
+    function filterHeadings() {
+      const q = document.getElementById("headingSearch").value.toLowerCase();
+      const filtered = allHeadings.filter(h => h.title.toLowerCase().includes(q));
+      renderHeadings(filtered);
+    }
+
+    async function loadSectionContent(headingObj) {
+      activeHeading = headingObj;
+      filterHeadings(); // Highlight selected item
+
+      const contentArea = document.getElementById("policyContentArea");
+      const toolbar = document.getElementById("readerToolbar");
+      toolbar.classList.add("hidden");
+
+      contentArea.innerHTML = `
+        <div class="text-center py-20 text-slate-400">
+          <i class="fa-solid fa-circle-notch fa-spin text-3xl text-teal-600 mb-2"></i>
+          <p class="text-xs font-medium text-slate-600">Fetching "${headingObj.title}"...</p>
+        </div>
+      `;
+
+      try {
+        const res = await callApi({
+          action: "getSectionContent",
+          index: headingObj.index
+        });
+
+        if (res.status === "success") {
+          toolbar.classList.remove("hidden");
+          toolbar.classList.add("flex");
+          contentArea.innerHTML = res.html || `<p class="text-sm text-slate-500">No text content under this heading.</p>`;
+        } else {
+          contentArea.innerHTML = `<p class="text-sm text-red-600">${res.message}</p>`;
+        }
+      } catch (err) {
+        contentArea.innerHTML = `<p class="text-sm text-red-600">Error loading policy section. Please try again.</p>`;
+      }
+    }
+
+    function openCorrectionModal() {
+      if (!activeHeading) return;
+      document.getElementById("corrHeadingTitle").innerText = activeHeading.title;
+      document.getElementById("corrText").value = "";
+      document.getElementById("correctionModal").classList.remove("hidden");
+      document.getElementById("correctionModal").classList.add("flex");
+    }
+
+    function closeCorrectionModal() {
+      document.getElementById("correctionModal").classList.add("hidden");
+      document.getElementById("correctionModal").classList.remove("flex");
+    }
+
+    async function submitCorrection() {
+      const text = document.getElementById("corrText").value.trim();
+      if (!text) return alert("कृपया सुधार का विवरण लिखें।");
+
+      const btn = document.getElementById("submitCorrBtn");
+      btn.disabled = true;
+      btn.innerText = "Submitting...";
+
+      try {
+        const res = await callApi({
+          action: "submitCorrection",
+          userName: currentUser.name,
+          userPhone: currentUser.phone,
+          userDept: currentUser.department,
+          headingTitle: activeHeading.title,
+          correctionText: text
+        });
+
+        if (res.status === "success") {
+          alert(res.message);
+          closeCorrectionModal();
+        } else {
+          alert(res.message);
+        }
+      } catch (err) {
+        alert("Failed to submit correction. Please try again.");
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Submit Correction";
+    }
+  </script>
+</body>
+</html>
