@@ -50,6 +50,7 @@
       .doc-footer-space { padding-top: 12px; }
       .doc-header-space { padding-bottom: 10px; }
 
+      /* हरे घेरे वाला हिस्सा पूरे Cover Page (Page 1) पर बीचोबीच छपे और 1. Objective Page 2 से शुरू हो */
       .policy-cover-page {
         page-break-after: always !important;
         break-after: page !important;
@@ -408,13 +409,34 @@
           toolbar.classList.remove("hidden");
           toolbar.classList.add("flex");
 
+          // पुराना डेटा होने पर भी 1. Objective से पहले की लाइनों को अपने आप Cover Page बॉक्स में लपेटें
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = res.html || "<p class='text-sm text-slate-500'>No content found.</p>";
+
+          if (!tempDiv.querySelector(".policy-cover-page")) {
+            const coverDiv = document.createElement("div");
+            coverDiv.className = "policy-cover-page text-center bg-slate-50/70 border border-slate-200 rounded-xl p-6 mb-6";
+            const nodes = Array.from(tempDiv.childNodes);
+            let hasCoverItems = false;
+
+            for (const node of nodes) {
+              const txt = (node.textContent || "").trim();
+              if (/^1[\.\)]\s+(Objective|Purpose|Introduction|Scope)/i.test(txt)) break;
+              if (txt) hasCoverItems = true;
+              coverDiv.appendChild(node);
+            }
+            if (hasCoverItems) {
+              tempDiv.insertBefore(coverDiv, tempDiv.firstChild);
+            }
+          }
+
           const headerBlock = res.headerHtml ? `<div class="doc-header-space border-b border-slate-200 pb-3 mb-4">${res.headerHtml}</div>` : "";
           const footerBlock = res.footerHtml ? `<div class="doc-footer-space border-t border-slate-200 pt-3 mt-6">${res.footerHtml}</div>` : "";
 
           contentArea.innerHTML = `
             <table class="print-wrapper w-full">
               ${headerBlock ? `<thead><tr><td>${headerBlock}</td></tr></thead>` : ""}
-              <tbody><tr><td>${res.html || "<p class='text-sm text-slate-500'>No content found.</p>"}</td></tr></tbody>
+              <tbody><tr><td>${tempDiv.innerHTML}</td></tr></tbody>
               ${footerBlock ? `<tfoot><tr><td>${footerBlock}</td></tr></tfoot>` : ""}
             </table>
           `;
