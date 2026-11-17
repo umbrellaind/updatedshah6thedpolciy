@@ -7,8 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
+    /* Cover Page को छोड़कर अंदर के पूरे मैटर का फॉन्ट 30% बड़ा (स्क्रीन और प्रिंट दोनों में) */
+    #policyContentArea table.print-wrapper > tbody div:not(.policy-cover-page):not(.policy-cover-page *),
+    #policyContentArea table.print-wrapper > tbody li {
+      font-size: 1.125rem !important; /* ~18px (14px से 30% अधिक) */
+      line-height: 1.65 !important;
+    }
+
+    #policyContentArea table.print-wrapper > tbody h3:not(.policy-cover-page *) {
+      font-size: 1.32rem !important; /* ~21px (16px से 30% अधिक) */
+      line-height: 1.4 !important;
+    }
+
+    #policyContentArea table.print-wrapper > tbody table:not(.policy-cover-page *) td,
+    #policyContentArea table.print-wrapper > tbody table:not(.policy-cover-page *) th {
+      font-size: 0.975rem !important; /* ~15.6px (12px से 30% अधिक) */
+      line-height: 1.45 !important;
+    }
+
     @media print {
-      @page { size: A4; margin: 10mm 12mm; }
+      @page {
+        size: A4;
+        margin: 10mm 12mm 16mm 12mm;
+        @bottom-right {
+          content: "Page " counter(page) " of " counter(pages);
+          font-size: 9pt;
+          font-weight: bold;
+          color: #1e293b;
+        }
+      }
       body { background: #ffffff !important; color: #000000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body * { visibility: hidden; }
       #policyReaderCard, #policyReaderCard * { visibility: visible; }
@@ -22,6 +49,20 @@
       table.print-wrapper > tbody > tr > td { border: none !important; padding: 0 !important; }
       .doc-footer-space { padding-top: 12px; }
       .doc-header-space { padding-bottom: 10px; }
+
+      .policy-cover-page {
+        page-break-after: always !important;
+        break-after: page !important;
+        min-height: 175mm;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        border: 1.5px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        padding: 24px !important;
+        margin-top: 10mm !important;
+      }
     }
   </style>
 </head>
@@ -34,7 +75,7 @@
         <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
           <i class="fa-solid fa-hospital"></i>
         </div>
-        <h1 class="text-xl font-bold tracking-wide">SHAH HOSPITAL</h1>
+        <h1 class="text-xl font-bold tracking-wide uppercase">SHAH HOSPITAL</h1>
         <p class="text-teal-200 text-xs mt-1">NABH 6th Edition Live Policy & SOP Portal</p>
       </div>
 
@@ -103,7 +144,7 @@
         <div class="flex items-center gap-3">
           <i class="fa-solid fa-shield-heart text-2xl text-teal-300"></i>
           <div>
-            <h1 class="font-bold text-base sm:text-lg leading-tight">SHAH HOSPITAL — NABH POLICY PORTAL</h1>
+            <h1 class="font-bold text-base sm:text-lg leading-tight uppercase">SHAH HOSPITAL — NABH POLICY PORTAL</h1>
             <p class="text-xs text-teal-200">Live Master Document Reader (6th Edition)</p>
           </div>
         </div>
@@ -367,7 +408,6 @@
           toolbar.classList.remove("hidden");
           toolbar.classList.add("flex");
 
-          // Google Doc के असली Header और Footer के साथ Print Wrapper बनाएं
           const headerBlock = res.headerHtml ? `<div class="doc-header-space border-b border-slate-200 pb-3 mb-4">${res.headerHtml}</div>` : "";
           const footerBlock = res.footerHtml ? `<div class="doc-footer-space border-t border-slate-200 pt-3 mt-6">${res.footerHtml}</div>` : "";
 
